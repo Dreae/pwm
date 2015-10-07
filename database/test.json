@@ -1,0 +1,18 @@
+{
+  "Folders": {
+    "Internet": {
+      "Accounts": {
+        "Personal": {
+          "AccountName": "personal@gmail.com",
+          "Password": "wat",
+          "URL": "https://google.com"
+        },
+        "Work": {
+          "AccountName": "work@gmail.com",
+          "Password": "wat",
+          "URL": "https://google.com"
+        }
+      }
+    }
+  }
+}

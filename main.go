@@ -7,12 +7,12 @@ import (
 	"github.com/dreae/pwm/screens"
 )
 
-func redraw(screen screens.Screen) {
+func redraw(screen screens.Screen, key termbox.Key) {
 	terminal := draw.TerminalWindow()
 
 	terminal.Print(0, 0, termbox.ColorDefault, termbox.ColorDefault, screen.GetTitle())
 	terminal.Fill(0, 1, terminal.Width, 1, termbox.Cell{Ch: '─'})
-	screen.Draw(draw.NewWindow(0, 2, terminal.Width, terminal.Height - 2))
+	screen.Draw(draw.NewWindow(0, 2, terminal.Width, terminal.Height - 2), key)
 	termbox.Flush()
 }
 
@@ -24,9 +24,10 @@ func main() {
   defer termbox.Close()
 
 	screen := screens.Database()
-	redraw(screen)
+	redraw(screen, termbox.KeyEsc)
 	for {
-		switch ev := termbox.PollEvent(); ev.Type {
+    ev := termbox.PollEvent()
+		switch ev.Type {
 		case termbox.EventKey:
 			switch ev.Ch {
 			case 'q':
@@ -39,6 +40,6 @@ func main() {
 				screen = screens.Load()
 			}
 		}
-		redraw(screen)
+		redraw(screen, ev.Key)
 	}
 }

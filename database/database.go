@@ -1,17 +1,48 @@
 package database
 
-type EntryType uint16
-const (
-  Entry_Folder EntryType = iota
-  Entry_Account
+import (
+  "sort"
+  "reflect"
+  "encoding/json"
 )
 
-type Entry struct {
-  Type EntryType
-  Name string
-  Value interface{}
+type Type int
+
+type Folder struct {
+  Folders map[string]Folder
+  Accounts map[string]Account
 }
 
-type Database struct {
-  Entries map[string]Entry
+type Account struct {
+  URL string
+  AccountName string
+  Password string
+}
+
+func Load(blob []byte) *Folder {
+  var rootFolder Folder
+  json.Unmarshal(blob, &rootFolder)
+  return &rootFolder
+}
+
+func (folder *Folder) FolderKeys() []string {
+  return keys(folder.Folders)
+}
+
+func (folder *Folder) AccountKeys() []string {
+  return keys(folder.Accounts)
+}
+
+func keys(obj interface{}) []string {
+  v := reflect.ValueOf(obj)
+  ks := v.MapKeys()
+
+  kStrings := make([]string, len(ks))
+  for i := range ks {
+    kStrings[i] = ks[i].String()
+  }
+
+  sort.Strings(kStrings)
+
+  return kStrings
 }

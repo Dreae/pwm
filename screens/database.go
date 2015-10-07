@@ -1,6 +1,8 @@
 package screens
 
 import (
+  "os"
+  "io/ioutil"
   "github.com/nsf/termbox-go"
   "github.com/dreae/pwm/draw"
   "github.com/dreae/pwm/database"
@@ -8,24 +10,37 @@ import (
 
 type DatabaseScreen struct {
   Title string
-  Database *database.Database
-  Parent *database.Entry
-  Selected *database.Entry
-  Current string
+  Root *database.Folder
+  Parent *database.Folder
+  Current *database.Folder
+  Selected int
 }
 
 func Database() Screen {
+  dbFile, err := os.Open("database/test.json")
+  if err != nil {
+    panic(err)
+  }
+  blob, err := ioutil.ReadAll(dbFile)
+  if err != nil {
+    panic(err)
+  }
+
   return &DatabaseScreen {
     Title: "Password Database",
-    Database: nil,
+    Root: database.Load(blob),
   }
 }
 
-func (scr *DatabaseScreen) Draw(w *draw.Window) {
-  if scr.Database == nil {
+func (scr *DatabaseScreen) Draw(w *draw.Window, key termbox.Key) {
+  if scr.Root == nil {
     w.Print(0, 0, termbox.ColorRed, termbox.ColorDefault, "No database loaded")
   } else {
-    scr.renderDatabase(w, scr.Database)
+    if scr.Parent == nil {
+      scr.renderFolder(w, scr.Root)
+    } else {
+      scr.renderFolder(w, scr.Parent)
+    }
   }
 }
 
@@ -33,20 +48,6 @@ func (scr *DatabaseScreen) GetTitle() string {
   return scr.Title
 }
 
-func (scr *DatabaseScreen) renderDatabase(w *draw.Window, db *database.Database) {
-  if scr.Parent != nil {
-    col1 := w.NewWindow(0, 0, 18, w.Height)
-    y := 0
+func (scr *DatabaseScreen) renderFolder(w *draw.Window, folder *database.Folder) {
 
-    parentEntries := scr.Parent.Value.(map[string]database.Entry)
-    for k := range parentEntries {
-      if parentEntries[k].Type == database.Entry_Account {
-        col := termbox.ColorDefault
-        if scr.Parent.Name == k {
-          col = termbox.ColorDefault | termbox.AttrReverse | termbox.AttrBold
-        }
-        col1.Print(0, y, col, col, k)
-      }
-    }
-  }
 }
