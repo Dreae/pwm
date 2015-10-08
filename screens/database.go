@@ -1,9 +1,7 @@
 package screens
 
 import (
-  "os"
   "fmt"
-  "io/ioutil"
   "github.com/nsf/termbox-go"
   "github.com/dreae/pwm/draw"
   "github.com/atotto/clipboard"
@@ -28,20 +26,11 @@ type Node struct {
   SelectedIndex int
 }
 
-func Database(w *draw.Window, statusCh chan string) Screen {
-  dbFile, err := os.Open("database/test.json")
-  if err != nil {
-    panic(err)
-  }
-  blob, err := ioutil.ReadAll(dbFile)
-  if err != nil {
-    panic(err)
-  }
-
+func Database(w *draw.Window, root *database.Folder, statusCh chan string) Screen {
   return &DatabaseScreen {
     Title: "Password Database",
     Window: w,
-    Root: database.Load(blob),
+    Root: root,
     StatusChannel: statusCh,
     ParentColumn: w.NewWindow(0, 0, 18, w.Height),
     CurrentColumn: w.NewWindow(19, 0, 32, w.Height),

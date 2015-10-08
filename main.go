@@ -5,6 +5,7 @@ import (
   "github.com/nsf/termbox-go"
 	"github.com/dreae/pwm/draw"
 	"github.com/dreae/pwm/screens"
+  "github.com/dreae/pwm/database"
 )
 
 func redraw(screen screens.Screen, event termbox.Event) {
@@ -31,17 +32,27 @@ func main() {
   go func() {
     for {
       status := <-statusCh
+      statusWindow.Clear()
       statusWindow.Print(0, 1, termbox.ColorDefault, termbox.ColorDefault, status)
       termbox.Flush()
     }
+  }()
+
+  database := func() *database.Folder {
+    defer func() {
+      recover()
+    }()
+
+    return screens.LoadFile("~/.pwm/database")
+    return nil
   }()
 
   screenList := struct {
     Database screens.Screen
     LoadDatabase screens.Screen
   }{
-    screens.Database(screenWindow, statusCh),
-    screens.Load(screenWindow),
+    screens.Database(screenWindow, database, statusCh),
+    screens.Load(screenWindow, statusCh),
   }
 
 	screen := screenList.Database
