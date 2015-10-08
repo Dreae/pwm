@@ -1,18 +1,48 @@
 {
-  "Folders": {
-    "Internet": {
-      "Accounts": {
-        "Personal": {
-          "AccountName": "personal@gmail.com",
-          "Password": "wat",
-          "URL": "https://google.com"
-        },
-        "Work": {
-          "AccountName": "work@gmail.com",
-          "Password": "wat",
-          "URL": "https://google.com"
+  "Folders": [
+    {
+      "Name": "Internet",
+      "Folders": [
+        {
+          "Name": "Google",
+          "Accounts": [
+            {
+              "Name": "Personal",
+              "AccountName": "personal@gmail.com",
+              "Password": "wat",
+              "URL": "https://google.com"
+            },
+            {
+              "Name": "Work",
+              "AccountName": "work@gmail.com",
+              "Password": "wat",
+              "URL": "https://google.com"
+            }
+          ]
         }
-      }
+      ]
+    },
+    {
+      "Name": "Internet2",
+      "Folders": [
+        {
+          "Name": "Google2",
+          "Accounts": [
+            {
+              "Name": "Personal",
+              "AccountName": "personal@gmail.com",
+              "Password": "wat",
+              "URL": "https://google.com"
+            },
+            {
+              "Name": "Work",
+              "AccountName": "work@gmail.com",
+              "Password": "wat",
+              "URL": "https://google.com"
+            }
+          ]
+        }
+      ]
     }
-  }
+  ]
 }

@@ -1,22 +1,33 @@
 package database
 
 import (
-  "sort"
-  "reflect"
   "encoding/json"
 )
 
 type Type int
+const (
+  Entry_Folder Type = iota
+  Entry_Account
+)
+
+type Entry interface {
+  Type() Type
+  GetName() string
+}
 
 type Folder struct {
-  Folders map[string]Folder
-  Accounts map[string]Account
+  Name string
+  Folders []*Folder
+  Accounts []*Account
+  Parent *Folder
 }
 
 type Account struct {
+  Name string
   URL string
   AccountName string
   Password string
+  Parent *Folder
 }
 
 func Load(blob []byte) *Folder {
@@ -25,24 +36,34 @@ func Load(blob []byte) *Folder {
   return &rootFolder
 }
 
-func (folder *Folder) FolderKeys() []string {
-  return keys(folder.Folders)
+func (folder *Folder) Count() int {
+  return len(folder.Folders) + len(folder.Accounts)
 }
 
-func (folder *Folder) AccountKeys() []string {
-  return keys(folder.Accounts)
-}
-
-func keys(obj interface{}) []string {
-  v := reflect.ValueOf(obj)
-  ks := v.MapKeys()
-
-  kStrings := make([]string, len(ks))
-  for i := range ks {
-    kStrings[i] = ks[i].String()
+func (folder *Folder) Items() []Entry {
+  items := make([]Entry, folder.Count())
+  for i := range folder.Folders {
+    items[i] = folder.Folders[i]
+  }
+  for i := range folder.Accounts {
+    items[i] = folder.Accounts[i]
   }
 
-  sort.Strings(kStrings)
+  return items
+}
 
-  return kStrings
+func (_ *Folder) Type() Type {
+  return Entry_Folder
+}
+
+func (_ *Account) Type() Type {
+  return Entry_Account
+}
+
+func (folder *Folder) GetName() string {
+  return folder.Name
+}
+
+func (account *Account) GetName() string {
+  return account.Name
 }

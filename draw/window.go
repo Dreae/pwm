@@ -30,6 +30,11 @@ func (w *Window) Print(x, y int, fg, bg termbox.Attribute, msg string) {
   }
 }
 
+func (w *Window) Clear() {
+  col := termbox.ColorDefault
+  w.Fill(0, 0, w.Width, w.Height, termbox.Cell{Ch: ' ', Fg: col, Bg: col})
+}
+
 func (w *Window) NewWindow(x, y, width, height int) *Window {
   return &Window{
     X: w.X + x,

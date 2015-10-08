@@ -7,12 +7,12 @@ import (
 	"github.com/dreae/pwm/screens"
 )
 
-func redraw(screen screens.Screen, key termbox.Key) {
+func redraw(screen screens.Screen, event termbox.Event) {
 	terminal := draw.TerminalWindow()
 
 	terminal.Print(0, 0, termbox.ColorDefault, termbox.ColorDefault, screen.GetTitle())
 	terminal.Fill(0, 1, terminal.Width, 1, termbox.Cell{Ch: '─'})
-	screen.Draw(draw.NewWindow(0, 2, terminal.Width, terminal.Height - 2), key)
+	screen.Draw(event)
 	termbox.Flush()
 }
 
@@ -23,8 +23,19 @@ func main() {
   }
   defer termbox.Close()
 
-	screen := screens.Database()
-	redraw(screen, termbox.KeyEsc)
+  terminal := draw.TerminalWindow()
+  screenWindow := draw.NewWindow(0, 2, terminal.Width, terminal.Height - 2)
+
+  screenList := struct {
+    Database screens.Screen
+    LoadDatabase screens.Screen
+  }{
+    screens.Database(screenWindow),
+    screens.Load(screenWindow),
+  }
+
+	screen := screenList.Database
+	redraw(screen, termbox.Event{})
 	for {
     ev := termbox.PollEvent()
 		switch ev.Type {
@@ -34,12 +45,12 @@ func main() {
 				return
 			case '1':
 				termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-				screen = screens.Database()
+				screen = screenList.Database
 			case '2':
 				termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-				screen = screens.Load()
+				screen = screenList.LoadDatabase
 			}
 		}
-		redraw(screen, ev.Key)
+		redraw(screen, ev)
 	}
 }

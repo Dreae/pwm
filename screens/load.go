@@ -9,18 +9,20 @@ var items = [2]string{"Load Database","Create New Database"}
 
 type LoadScreen struct {
   Title string
+  Window *draw.Window
   Selected int
 }
 
-func Load() Screen {
+func Load(w *draw.Window) Screen {
   return &LoadScreen{
     Title: "Load Database",
+    Window: w,
     Selected: 0,
   }
 }
 
-func (scr *LoadScreen) Draw(w *draw.Window, key termbox.Key) {
-  switch key {
+func (scr *LoadScreen) Draw(event termbox.Event) {
+  switch event.Key {
   case termbox.KeyArrowDown:
     scr.Selected = scr.Selected + 1
     if scr.Selected == len(items) {
@@ -40,7 +42,7 @@ func (scr *LoadScreen) Draw(w *draw.Window, key termbox.Key) {
     if i == scr.Selected {
       itemCol = col | termbox.AttrReverse
     }
-    w.Print(0, y, itemCol, itemCol, items[i])
+    scr.Window.Print(0, y, itemCol, itemCol, items[i])
     y += 1
   }
 }
