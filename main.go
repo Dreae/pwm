@@ -24,13 +24,23 @@ func main() {
   defer termbox.Close()
 
   terminal := draw.TerminalWindow()
-  screenWindow := draw.NewWindow(0, 2, terminal.Width, terminal.Height - 2)
+  screenWindow := draw.NewWindow(0, 2, terminal.Width, terminal.Height - 4)
+  statusWindow := draw.NewWindow(0, terminal.Height - 2, terminal.Width, 2)
+
+  statusCh := make(chan string)
+  go func() {
+    for {
+      status := <-statusCh
+      statusWindow.Print(0, 1, termbox.ColorDefault, termbox.ColorDefault, status)
+      termbox.Flush()
+    }
+  }()
 
   screenList := struct {
     Database screens.Screen
     LoadDatabase screens.Screen
   }{
-    screens.Database(screenWindow),
+    screens.Database(screenWindow, statusCh),
     screens.Load(screenWindow),
   }
 

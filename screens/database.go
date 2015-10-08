@@ -14,6 +14,7 @@ type DatabaseScreen struct {
   Title string
   Window *draw.Window
   Root *database.Folder
+  StatusChannel chan string
   Path []Node
   Current *database.Folder
   Selected int
@@ -27,7 +28,7 @@ type Node struct {
   SelectedIndex int
 }
 
-func Database(w *draw.Window) Screen {
+func Database(w *draw.Window, statusCh chan string) Screen {
   dbFile, err := os.Open("database/test.json")
   if err != nil {
     panic(err)
@@ -41,10 +42,16 @@ func Database(w *draw.Window) Screen {
     Title: "Password Database",
     Window: w,
     Root: database.Load(blob),
+    StatusChannel: statusCh,
     ParentColumn: w.NewWindow(0, 0, 18, w.Height),
     CurrentColumn: w.NewWindow(19, 0, 32, w.Height),
     NextColumn: w.NewWindow(52, 0, 32, w.Height),
   }
+}
+
+func (scr *DatabaseScreen) copyPassword(account *database.Account) {
+  clipboard.WriteAll(account.Password)
+  scr.StatusChannel<-"Password copied"
 }
 
 func (scr *DatabaseScreen) Draw(event termbox.Event) {
@@ -56,8 +63,7 @@ func (scr *DatabaseScreen) Draw(event termbox.Event) {
   case termbox.KeyArrowRight:
     item := scr.Current.Items()[scr.Selected]
     if item.Type() == database.Entry_Account {
-      account := item.(*database.Account)
-      clipboard.WriteAll(account.Password)
+      scr.copyPassword(item.(*database.Account))
     } else {
       node := Node{
         Selected: scr.Current,
@@ -76,13 +82,12 @@ func (scr *DatabaseScreen) Draw(event termbox.Event) {
       scr.Selected = node.SelectedIndex
     }
   }
-  
+
   switch event.Ch {
   case 'c':
     item := scr.Current.Items()[scr.Selected]
     if item.Type() == database.Entry_Account {
-      account := item.(*database.Account)
-      clipboard.WriteAll(account.Password)
+      scr.copyPassword(item.(*database.Account))
     }
   }
 
