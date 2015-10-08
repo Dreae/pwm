@@ -12,7 +12,7 @@ func GetString(buffer *bytes.Buffer, cb chan string) {
     case termbox.KeyEnter:
       close(cb)
       return
-    case termbox.KeyBackspace:
+    case termbox.KeyBackspace, termbox.KeyDelete, termbox.KeyBackspace2:
       if buffer.Len() > 0 {
         buffer.Truncate(buffer.Len() - 1)
       }

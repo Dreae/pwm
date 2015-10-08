@@ -4,7 +4,6 @@ import (
   "os"
   "fmt"
   "bytes"
-  "io/ioutil"
   "encoding/json"
   "path/filepath"
   "github.com/nsf/termbox-go"
@@ -103,24 +102,25 @@ func loadDraw(w *draw.Window, statusCh chan string) {
       }
     }
   }()
-  LoadFile(buffer.String())
+  root := LoadFile(buffer.String())
+  ScreenList["Database"] = Database(w, root, statusCh)
 }
 
 func LoadFile(file string) *database.Folder {
   dbFile, err := os.Open(file)
-  if err != nil {
-    panic(err)
-  }
-  blob, err := ioutil.ReadAll(dbFile)
-  if err != nil {
-    panic(err)
-  }
-  var root database.Folder
-  err = json.Unmarshal(blob, &root)
-  if err != nil {
-    panic(err)
-  }
+  defer func() {
+    dbFile.Close()
+  }()
 
+  if err != nil {
+    panic(err)
+  }
+  decode := json.NewDecoder(dbFile)
+  var root database.Folder
+  err = decode.Decode(&root)
+  if err != nil {
+    panic(err)
+  }
   return &root
 }
 

@@ -4,6 +4,7 @@ import (
   "fmt"
   "github.com/nsf/termbox-go"
   "github.com/dreae/pwm/draw"
+  "github.com/dreae/pwm/crypto"
   "github.com/atotto/clipboard"
   "github.com/dreae/pwm/database"
 )
@@ -28,7 +29,7 @@ type Node struct {
 
 func Database(w *draw.Window, root *database.Folder, statusCh chan string) Screen {
   return &DatabaseScreen {
-    Title: "Password Database",
+    Title: fmt.Sprintf("Password Database"),
     Window: w,
     Root: root,
     StatusChannel: statusCh,
@@ -39,7 +40,7 @@ func Database(w *draw.Window, root *database.Folder, statusCh chan string) Scree
 }
 
 func (scr *DatabaseScreen) copyPassword(account *database.Account) {
-  clipboard.WriteAll(account.Password)
+  clipboard.WriteAll(crypto.Session.Decrypt([]byte(account.Password)))
   scr.StatusChannel<-"Password copied"
 }
 

@@ -47,15 +47,10 @@ func main() {
     return nil
   }()
 
-  screenList := struct {
-    Database screens.Screen
-    LoadDatabase screens.Screen
-  }{
-    screens.Database(screenWindow, database, statusCh),
-    screens.Load(screenWindow, statusCh),
-  }
+  screens.ScreenList["Database"] = screens.Database(screenWindow, database, statusCh)
+  screens.ScreenList["LoadDatabase"] = screens.Load(screenWindow, statusCh)
 
-	screen := screenList.Database
+	screen := screens.ScreenList["Database"]
 	redraw(screen, termbox.Event{})
 	for {
     ev := termbox.PollEvent()
@@ -66,10 +61,10 @@ func main() {
 				return
 			case '1':
 				termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-				screen = screenList.Database
+				screen = screens.ScreenList["Database"]
 			case '2':
 				termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-				screen = screenList.LoadDatabase
+				screen = screens.ScreenList["LoadDatabase"]
 			}
 		}
 		redraw(screen, ev)

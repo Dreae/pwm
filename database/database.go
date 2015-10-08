@@ -1,10 +1,13 @@
 package database
 
 import (
+  "errors"
   "encoding/json"
+  "github.com/dreae/pwm/crypto"
 )
 
 type Type int
+type Password []byte
 const (
   Entry_Folder Type = iota
   Entry_Account
@@ -26,7 +29,7 @@ type Account struct {
   Name string
   URL string
   AccountName string
-  Password string
+  Password Password
   Parent *Folder
 }
 
@@ -66,4 +69,12 @@ func (folder *Folder) GetName() string {
 
 func (account *Account) GetName() string {
   return account.Name
+}
+
+func (password *Password) UnmarshalJSON(data []byte) error {
+  if password == nil {
+    return errors.New("Password is null")
+  }
+  *password = Password(crypto.Session.Encrypt(string(data[1:len(data) - 1])))
+  return nil
 }
